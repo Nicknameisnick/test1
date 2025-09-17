@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sns
+import streamlit as st
 
 pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)       
@@ -76,6 +77,8 @@ fig = px.line(
 fig.update_traces(mode='lines+markers')
 
 fig.show()
+st.plotly_chart(fig)
+
 
 
 
