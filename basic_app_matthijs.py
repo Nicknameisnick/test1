@@ -1,3 +1,4 @@
+pip install --upgrade pip
 import requests
 import pandas as pd
 import numpy as np
@@ -78,6 +79,7 @@ fig.update_traces(mode='lines+markers')
 
 fig.show()
 st.plotly_chart(fig)
+
 
 
 
