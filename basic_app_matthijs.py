@@ -2,6 +2,8 @@ import requests
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)       
@@ -74,6 +76,7 @@ fig = px.line(
 fig.update_traces(mode='lines+markers')
 
 fig.show()
+
 
 
 
