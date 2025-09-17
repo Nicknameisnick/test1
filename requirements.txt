@@ -1,0 +1,6 @@
+requests
+pandas
+numpy
+plotly.express
+matplotlib.pyplot
+seaborn
