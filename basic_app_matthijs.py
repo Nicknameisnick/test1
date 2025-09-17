@@ -1,9 +1,6 @@
 import requests
 import pandas as pd
 import numpy as np
-pip install matplotlib
-import matplotlib.pyplot as plt
-pip install seaborn
 import seaborn as sns
 
 pd.options.display.max_rows = 999
@@ -77,4 +74,5 @@ fig = px.line(
 fig.update_traces(mode='lines+markers')
 
 fig.show()
+
 
