@@ -1,7 +1,6 @@
 import requests
 import pandas as pd
 import numpy as np
-import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -74,4 +73,5 @@ fig = px.line(
             labels={'x': 'Year', 'historical_population': 'Population'}
         )
 fig.update_traces(mode='lines+markers')
+
 fig.show()
