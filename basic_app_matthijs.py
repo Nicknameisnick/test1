@@ -3,7 +3,6 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 
-# Page config
 st.set_page_config(page_title="G7 Population Dashboard", layout="wide")
 
 # Function to get population data
@@ -19,10 +18,10 @@ def get_population_data(country_name):
         if not hist_df.empty:
             hist_df = hist_df.set_index("year")
             hist_df.index = hist_df.index.astype(int)
-            # Ensure migrants column exists
             if "migrants" not in hist_df.columns:
                 hist_df["migrants"] = None
     return hist_df
+
 
 # Sidebar controls
 st.sidebar.title("Controls")
@@ -68,22 +67,24 @@ for c in selected_countries:
             )
             fig_pop.add_trace(go.Scatter(
                 x=hist_df.index,
-                y=hist_df["population"] / 1_000_000,  # Convert to millions
+                y=hist_df["population"],
                 mode=mode,
                 name=c,
                 hovertemplate=(
                     "Year: %{x}<br>" +
                     "Population: %{y:.1f}M<br>" +
                     f"Country: {c}<extra></extra>"
-                )
+                ),
+                # Convert to millions
+                y=hist_df["population"] / 1_000_000
             ))
 
 fig_pop.update_layout(
     title="Population Trends of G7 Countries",
     xaxis_title="Year",
     yaxis_title="Population (millions)",
-    height=700,
-    width=1200,
+    height=600,
+    width=1100,
     template="plotly_white"
 )
 st.plotly_chart(fig_pop, use_container_width=True)
@@ -115,13 +116,10 @@ if data_found:
         title="Migrants Over Time",
         xaxis_title="Year",
         yaxis_title="Migrants (millions)",
-        height=600,
-        width=1200,
+        height=500,
+        width=1100,
         template="plotly_white"
     )
     st.plotly_chart(fig_mig, use_container_width=True)
 else:
     st.warning("⚠️ No migrants data available for the selected countries and years.")
-
-
-
