@@ -17,9 +17,14 @@ def get_population_data(country_name):
     if response.status_code == 200:
         data = response.json()
         hist_df = pd.DataFrame(data.get("historical_population", []))
+
         if not hist_df.empty:
             hist_df = hist_df.set_index("year")
-            hist_df.index = hist_df.index.astype(int)  # ✅ ensure year is int
+            hist_df.index = hist_df.index.astype(int)
+
+            # ✅ Ensure "migrants" column always exists
+            if "migrants" not in hist_df.columns:
+                hist_df["migrants"] = None
     return hist_df
 
 
@@ -55,8 +60,6 @@ st.markdown(
     The **G7 (Group of Seven)** is an intergovernmental forum of seven of the world’s largest 
     advanced economies: **Canada, France, Germany, Italy, Japan, the United Kingdom, and the United States**.  
     These countries play a key role in global economic governance, trade policy, and international relations.  
-
-    This dashboard shows **population growth** and **migration flows** of the G7 countries.
     """
 )
 
@@ -92,28 +95,30 @@ st.plotly_chart(fig_pop, use_container_width=True)
 
 # 2️⃣ Migrants over time (line plot)
 fig_mig = go.Figure()
+data_found = False  # track if any migrants data exists
 for c in selected_countries:
     hist_df = get_population_data(c)
-    if not hist_df.empty and "migrants" in hist_df.columns:
+    if not hist_df.empty:
         mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
         hist_df = hist_df.loc[mask]
 
-        # Only plot if migrants column has valid values
-        if hist_df["migrants"].notna().any():
+        if "migrants" in hist_df.columns and hist_df["migrants"].notna().any():
+            data_found = True
             fig_mig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["migrants"],
                                          mode="lines+markers", name=c))
 
-fig_mig.update_layout(
-    title="Migrants Over Time",
-    xaxis_title="Year",
-    yaxis_title="Number of Migrants",
-    height=500,
-    width=1100,
-    template="plotly_white"
-)
-st.plotly_chart(fig_mig, use_container_width=True)
-
-
+if data_found:
+    fig_mig.update_layout(
+        title="Migrants Over Time",
+        xaxis_title="Year",
+        yaxis_title="Number of Migrants",
+        height=500,
+        width=1100,
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_mig, use_container_width=True)
+else:
+    st.warning("⚠️ No migrants data available from the API for the selected countries and years.")
 
 
 
