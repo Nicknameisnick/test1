@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
+import plotly.express as px
 
 st.set_page_config(page_title="G7 Population Dashboard", layout="wide")
 
@@ -19,7 +20,6 @@ def get_population_data(country_name):
         hist_df = pd.DataFrame(data.get("historical_population", []))
         if not hist_df.empty:
             hist_df = hist_df.set_index("year")
-            hist_df.rename(columns={"population": "historical_population"}, inplace=True)
             hist_df.index = hist_df.index.astype(int)  # ✅ ensure year is int
     return hist_df
 
@@ -29,10 +29,7 @@ def get_population_data(country_name):
 # -------------------------------
 st.sidebar.title("Controls")
 
-# Year range slider
 year_range = st.sidebar.slider("Select Year Range", 1950, 2025, (1970, 2020))
-
-# Select all toggle
 select_all = st.sidebar.toggle("Select/Deselect All Countries", value=True)
 
 countries = [
@@ -40,15 +37,14 @@ countries = [
     "United Kingdom", "United States of America"
 ]
 
-# Country multiselect (default all if toggle = True)
 if select_all:
     selected_countries = st.sidebar.multiselect("Select Countries", countries, default=countries)
 else:
     selected_countries = st.sidebar.multiselect("Select Countries", countries, default=[])
 
-# Line and marker display options
 show_lines = st.sidebar.checkbox("Show Lines", value=True)
 show_points = st.sidebar.checkbox("Show Points", value=True)
+
 
 # -------------------------------
 # Main content
@@ -61,14 +57,12 @@ st.markdown(
     advanced economies: **Canada, France, Germany, Italy, Japan, the United Kingdom, and the United States**.  
     These countries play a key role in global economic governance, trade policy, and international relations.  
 
-    This dashboard shows the historical population growth of the G7 countries, allowing you to 
-    explore trends and compare across nations.
+    This dashboard shows **population growth**, **migration flows**, and **median age** trends of the G7 countries.
     """
 )
 
-# Create plot
-fig = go.Figure()
-
+# 1️⃣ Population Trends
+fig_pop = go.Figure()
 for c in selected_countries:
     hist_df = get_population_data(c)
     if not hist_df.empty:
@@ -83,26 +77,60 @@ for c in selected_countries:
                 if show_lines
                 else "markers"
             )
+            fig_pop.add_trace(go.Scatter(x=hist_df.index, y=hist_df["population"],
+                                         mode=mode, name=c))
 
-            fig.add_trace(
-                go.Scatter(
-                    x=hist_df.index,
-                    y=hist_df["historical_population"],
-                    mode=mode,
-                    name=c,
-                )
-            )
-
-fig.update_layout(
+fig_pop.update_layout(
     title="Population Trends of G7 Countries",
     xaxis_title="Year",
     yaxis_title="Population",
-    template="plotly_white",
-    height=800,  # ✅ make graph bigger
-    width=1200   # ✅ make graph bigger
+    height=600,
+    width=1100,
+    template="plotly_white"
 )
+st.plotly_chart(fig_pop, use_container_width=True)
 
-st.plotly_chart(fig, use_container_width=True)
+
+# 2️⃣ Migrants over time (line plot)
+fig_mig = go.Figure()
+for c in selected_countries:
+    hist_df = get_population_data(c)
+    if not hist_df.empty and "migrants" in hist_df.columns:
+        mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+        hist_df = hist_df.loc[mask]
+        fig_mig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["migrants"],
+                                     mode="lines+markers", name=c))
+
+fig_mig.update_layout(
+    title="Migrants Over Time",
+    xaxis_title="Year",
+    yaxis_title="Number of Migrants",
+    height=500,
+    width=1100,
+    template="plotly_white"
+)
+st.plotly_chart(fig_mig, use_container_width=True)
+
+
+# 3️⃣ Median Age (barplot latest available year)
+latest_median_age = []
+for c in selected_countries:
+    hist_df = get_population_data(c)
+    if not hist_df.empty and "median_age" in hist_df.columns:
+        latest_year = hist_df.index.max()
+        latest_age = hist_df.loc[latest_year, "median_age"]
+        latest_median_age.append({"Country": c, "Median Age": latest_age})
+
+if latest_median_age:
+    df_age = pd.DataFrame(latest_median_age)
+    fig_age = px.bar(df_age, x="Country", y="Median Age", 
+                     title="Median Age (Latest Year Available)",
+                     text="Median Age", color="Country",
+                     color_discrete_sequence=px.colors.qualitative.Set3)
+    fig_age.update_traces(textposition="outside")
+    fig_age.update_layout(height=500, width=1000)
+    st.plotly_chart(fig_age, use_container_width=True)
+
 
 
 
