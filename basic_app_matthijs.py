@@ -1,11 +1,22 @@
 
+# ! Beoordelingscriteria !
+#01 Data verzameling: Heeft een creatieve dataset gebruikt om hier een dashboard van te maken.
+#02 Data verkenning: Er is een grondige verkenning gedaan van de data en er zijn onderbouwde keuzes gemaakt om data kwaliteitsissues te ondervangen. 
+#03 Analyse: bevat naast beschrijvende analyses ook statistiek of voorspellende modellen. Er zijn nieuwe variabelen verkregen door data manipulatie.
+#04 Presentatie van Blog: is helder opgebouwd, bevat tekst, code en interactieve visualisaties en er wordt gebruik gemaakt van mooie layout en formatting.
+
+# dit moet in de code komen te staan
+#05 Slider knop om info te filteren
+#06 Checkboxen die info filteren
+#3 Dropdown menu met meerdere waardes
+
 import requests
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sns
-import streamlit as st
+import plotly.graph_objects as go
 
 pd.options.display.max_rows = 999
 pd.set_option('display.width', 1000)       
@@ -44,7 +55,7 @@ def get_population_data(country_name):
         hist_df = hist_df.dropna(subset=key_cols, how='all')
         hist_df = hist_df.sort_index()
         
-        print(hist_df[['historical_population', 'median_age', 'fertility_rate', 'country_name']])
+        #print(hist_df[['historical_population', 'median_age', 'fertility_rate', 'country_name']])
     else:
         print(f"Error: {response.status_code}, {response.text}")
 
@@ -56,29 +67,45 @@ def get_population_data(country_name):
     if response1.status_code == 200:
         data1 = response1.json() 
         hist_df1 = pd.DataFrame(data1)
-        print(hist_df1)
+        #print(hist_df1)
     else:
         print(f"Error: {response1.status_code}, {response1.text}")
 
     return hist_df
 
 
-# ✅ gebruik:
-country_name = 'USA'
-hist_df = get_population_data(country_name)
+# The G7 (Group of Seven) consists of the advanced economies of Canada, France, Germany, Italy, Japan, the United Kingdom, and the United States
+# ----------------------------------------------------------------------------------------------------------------------------------------------
+'''
+for i in ['Canada', 'France', 'Germany', 'Italy', 'Japan','United Kingdom', 'United States of America']:
+    hist_df = get_population_data(i)
+    fig = px.line(
+                hist_df,
+                x=hist_df.index,
+                y='historical_population',
+                title=f'Historical Population of {(i)}',
+                labels={'x': 'Year', 'historical_population': 'Population'}
+            )
+    fig.update_traces(mode='lines+markers')
+    fig.show()
+'''
 
-#Plots enzovoort maken
-fig = px.line(
-            hist_df,
-            x=hist_df.index,
-            y='historical_population',
-            title=f'Historical Population of {country_name}',
-            labels={'x': 'Year', 'historical_population': 'Population'}
-        )
-fig.update_traces(mode='lines+markers')
+#st.plotly_chart(fig)
 
+fig = go.Figure()
+for i in ['Canada', 'France', 'Germany', 'Italy', 'Japan','United Kingdom', 'United States of America']:
+    hist_df = get_population_data(i)
+    fig.add_trace(go.Scatter(x=hist_df.index, 
+                             y=hist_df['historical_population'], 
+                             mode='lines',
+                             name=i))
+fig.update_layout(
+    title="population per country",
+    xaxis_title="Year",
+    yaxis_title='Population'
+)
 fig.show()
-st.plotly_chart(fig)
+
 
 
 
