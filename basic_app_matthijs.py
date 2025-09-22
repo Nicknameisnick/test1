@@ -62,10 +62,28 @@ for c in countries:
     if country_selection[c]:  # alleen geselecteerde landen
         hist_df = get_population_data(c)
 
-        if not hist_df.empty:  # ✅ check om errors te voorkomen
-            hist_df = hist_df.loc[hist_df.index.between(year_range[0], year_range[1])]
+        if not hist_df.empty:
+            # ✅ Zorg dat index integers zijn
+            try:
+                hist_df.index = hist_df.index.astype(int)
+            except Exception:
+                continue  # sla dit land over als conversie faalt
 
-            mode = "lines+markers" if (show_lines and show_points) else "lines" if show_lines else "markers"
+            # ✅ Filter veilig binnen de jaarrange
+            mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+            hist_df = hist_df.loc[mask]
+
+            if hist_df.empty:
+                continue
+
+            mode = (
+                "lines+markers"
+                if (show_lines and show_points)
+                else "lines"
+                if show_lines
+                else "markers"
+            )
+
             fig.add_trace(
                 go.Scatter(
                     x=hist_df.index,
@@ -75,6 +93,7 @@ for c in countries:
                 )
             )
 
+
 fig.update_layout(
     title="📈 Populatie per land",
     xaxis_title="Jaar",
@@ -83,5 +102,6 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
 
 
