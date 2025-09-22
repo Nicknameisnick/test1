@@ -2,7 +2,6 @@ import requests
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
-import plotly.express as px
 
 st.set_page_config(page_title="G7 Population Dashboard", layout="wide")
 
@@ -57,7 +56,7 @@ st.markdown(
     advanced economies: **Canada, France, Germany, Italy, Japan, the United Kingdom, and the United States**.  
     These countries play a key role in global economic governance, trade policy, and international relations.  
 
-    This dashboard shows **population growth**, **migration flows**, and **median age** trends of the G7 countries.
+    This dashboard shows **population growth** and **migration flows** of the G7 countries.
     """
 )
 
@@ -98,8 +97,11 @@ for c in selected_countries:
     if not hist_df.empty and "migrants" in hist_df.columns:
         mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
         hist_df = hist_df.loc[mask]
-        fig_mig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["migrants"],
-                                     mode="lines+markers", name=c))
+
+        # Only plot if migrants column has valid values
+        if hist_df["migrants"].notna().any():
+            fig_mig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["migrants"],
+                                         mode="lines+markers", name=c))
 
 fig_mig.update_layout(
     title="Migrants Over Time",
@@ -110,7 +112,6 @@ fig_mig.update_layout(
     template="plotly_white"
 )
 st.plotly_chart(fig_mig, use_container_width=True)
-
 
 
 
