@@ -51,26 +51,32 @@ def get_population_data(country_name):
 st.title("🌍 G7 Population Dashboard")
 st.write("Interactieve analyse van historische populatiedata via de Ninja API.")
 
-# Dropdown menu
+# G7 landen
 countries = ["Canada", "France", "Germany", "Italy", "Japan", "United Kingdom", "United States of America"]
-selected_countries = st.multiselect("Selecteer landen:", countries, default=["United States of America"])
 
-# Slider
+# Sliders voor jaarrange
 year_min, year_max = 1960, 2025
 year_range = st.slider("Selecteer een jaarrange:", year_min, year_max, (1980, 2020))
 
-# Checkboxes
+# Checkbox voor lijnen en punten
 show_lines = st.checkbox("Toon lijngrafieken", value=True)
 show_points = st.checkbox("Toon datapunten", value=False)
 
-# Plot
-fig = go.Figure()
-for c in selected_countries:
-    hist_df = get_population_data(c)
-    hist_df = hist_df.loc[hist_df.index.between(year_range[0], year_range[1])]
+# Landen checkboxes
+st.subheader("Selecteer landen:")
+country_selection = {}
+for c in countries:
+    country_selection[c] = st.checkbox(c, value=True)  # alles standaard aan
 
-    mode = "lines+markers" if (show_lines and show_points) else "lines" if show_lines else "markers"
-    fig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["historical_population"], mode=mode, name=c))
+# Plot maken
+fig = go.Figure()
+for c in countries:
+    if country_selection[c]:  # alleen als checkbox aan staat
+        hist_df = get_population_data(c)
+        hist_df = hist_df.loc[hist_df.index.between(year_range[0], year_range[1])]
+
+        mode = "lines+markers" if (show_lines and show_points) else "lines" if show_lines else "markers"
+        fig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["historical_population"], mode=mode, name=c))
 
 fig.update_layout(
     title="📈 Populatie per land",
@@ -82,7 +88,6 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True)
 
 st.success("✅ Dashboard geladen!")
-
 
 
 
