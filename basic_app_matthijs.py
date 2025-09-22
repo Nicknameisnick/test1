@@ -112,24 +112,7 @@ fig_mig.update_layout(
 st.plotly_chart(fig_mig, use_container_width=True)
 
 
-# 3️⃣ Median Age (barplot latest available year)
-latest_median_age = []
-for c in selected_countries:
-    hist_df = get_population_data(c)
-    if not hist_df.empty and "median_age" in hist_df.columns:
-        latest_year = hist_df.index.max()
-        latest_age = hist_df.loc[latest_year, "median_age"]
-        latest_median_age.append({"Country": c, "Median Age": latest_age})
 
-if latest_median_age:
-    df_age = pd.DataFrame(latest_median_age)
-    fig_age = px.bar(df_age, x="Country", y="Median Age", 
-                     title="Median Age (Latest Year Available)",
-                     text="Median Age", color="Country",
-                     color_discrete_sequence=px.colors.qualitative.Set3)
-    fig_age.update_traces(textposition="outside")
-    fig_age.update_layout(height=500, width=1000)
-    st.plotly_chart(fig_age, use_container_width=True)
 
 
 
