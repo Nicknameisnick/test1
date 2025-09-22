@@ -1,3 +1,8 @@
+import requests
+import pandas as pd
+import streamlit as st
+import plotly.graph_objects as go
+
 # Population Trends
 fig_pop = go.Figure()
 for c in selected_countries:
@@ -71,5 +76,6 @@ if data_found:
     st.plotly_chart(fig_mig, use_container_width=True)
 else:
     st.warning("⚠️ No migrants data available for the selected countries and years.")
+
 
 
