@@ -138,7 +138,7 @@ for c in selected_countries:
                                          mode=mode, name=c))
 
 fig_pop.update_layout(
-    title="Population Trends of G7 Countries",
+    title="Median age of G7 Countries",
     xaxis_title="Year",
     yaxis_title="Median age",
     height=600,
@@ -146,6 +146,7 @@ fig_pop.update_layout(
     template="plotly_white"
 )
 st.plotly_chart(fig_pop, use_container_width=True)
+
 
 
 
