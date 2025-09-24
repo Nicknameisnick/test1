@@ -176,14 +176,24 @@ with tab4:
         )
         st.plotly_chart(fig1, use_container_width=True)
 
-        # R values per country
+        # R values per country + overall
         r_values1 = []
         for c in df1["country"].unique():
             sub = df1[df1["country"] == c]
             if len(sub) > 1:
                 r = np.corrcoef(sub["median_age"], sub["fertility_rate"])[0, 1]
                 r_values1.append({"Country": c, "R (Median Age vs Fertility Rate)": round(r, 2)})
-        st.dataframe(pd.DataFrame(r_values1).set_index("Country"))
+
+        # overall R
+        if len(df1) > 1:
+            r_overall = np.corrcoef(df1["median_age"], df1["fertility_rate"])[0, 1]
+            r_values1.append({"Country": "Overall", "R (Median Age vs Fertility Rate)": round(r_overall, 2)})
+
+        st.dataframe(
+            pd.DataFrame(r_values1).set_index("Country"),
+            use_container_width=True,
+            column_config={"Country": st.column_config.Column(width="medium")}
+        )
 
         # --- Scatterplot 2: Median Age vs Migrants ---
         df2 = df_all[["median_age", "migrants", "country"]].dropna()
@@ -204,14 +214,23 @@ with tab4:
         )
         st.plotly_chart(fig2, use_container_width=True)
 
-        # R values per country
+        # R values per country + overall
         r_values2 = []
         for c in df2["country"].unique():
             sub = df2[df2["country"] == c]
             if len(sub) > 1:
                 r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
                 r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
-        st.dataframe(pd.DataFrame(r_values2).set_index("Country"))
+
+        if len(df2) > 1:
+            r_overall = np.corrcoef(df2["median_age"], df2["migrants"])[0, 1]
+            r_values2.append({"Country": "Overall", "R (Median Age vs Migrants)": round(r_overall, 2)})
+
+        st.dataframe(
+            pd.DataFrame(r_values2).set_index("Country"),
+            use_container_width=True,
+            column_config={"Country": st.column_config.Column(width="medium")}
+        )
 
         # --- Scatterplot 3: Median Age vs Urban Population % ---
         df3 = df_all[["median_age", "urban_population_pct", "country"]].dropna()
@@ -232,15 +251,23 @@ with tab4:
         )
         st.plotly_chart(fig3, use_container_width=True)
 
-        # R values per country
+        # R values per country + overall
         r_values3 = []
         for c in df3["country"].unique():
             sub = df3[df3["country"] == c]
             if len(sub) > 1:
                 r = np.corrcoef(sub["median_age"], sub["urban_population_pct"])[0, 1]
                 r_values3.append({"Country": c, "R (Median Age vs Urban Pop. %)": round(r, 2)})
-        st.dataframe(pd.DataFrame(r_values3).set_index("Country"))
 
+        if len(df3) > 1:
+            r_overall = np.corrcoef(df3["median_age"], df3["urban_population_pct"])[0, 1]
+            r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": round(r_overall, 2)})
+
+        st.dataframe(
+            pd.DataFrame(r_values3).set_index("Country"),
+            use_container_width=True,
+            column_config={"Country": st.column_config.Column(width="medium")}
+        )
 
 
 
