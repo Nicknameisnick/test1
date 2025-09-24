@@ -156,10 +156,7 @@ with tab4:
 
     if combined_data:
         df_all = pd.concat(combined_data)
-
-        # ==============================
-        # 1️⃣ Median Age vs Fertility Rate
-        # ==============================
+        # Median Age vs Fertility Rate
         df1 = df_all[["median_age", "fertility_rate", "country"]].dropna()
         fig1 = go.Figure()
         for c in df1["country"].unique():
@@ -190,9 +187,7 @@ with tab4:
 
         st.dataframe(pd.DataFrame(r_values1).set_index("Country"), use_container_width=True)
 
-        # ==============================
-        # 2️⃣ Median Age vs Migrants
-        # ==============================
+        # Median Age vs Migrants
         df2 = df_all[["median_age", "migrants", "country"]].dropna()
         fig2 = go.Figure()
         for c in df2["country"].unique():
@@ -223,9 +218,8 @@ with tab4:
 
         st.dataframe(pd.DataFrame(r_values2).set_index("Country"), use_container_width=True)
 
-        # ==============================
-        # 3️⃣ Median Age vs Urban Population %
-        # ==============================
+        # Median Age vs Urban Population %
+        
         df3 = df_all[["median_age", "urban_population_pct", "country"]].dropna()
         fig3 = go.Figure()
         for c in df3["country"].unique():
@@ -255,6 +249,7 @@ with tab4:
         r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": round(overall_r3, 2)})
 
         st.dataframe(pd.DataFrame(r_values3).set_index("Country"), use_container_width=True)
+
 
 
 
