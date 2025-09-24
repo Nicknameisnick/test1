@@ -145,8 +145,10 @@ with tab3:
 
 
 with tab4:
-    st.subheader("Correlations")
+    st.subheader("Correlations Across G7 Countries")
 
+    # Collect combined data
+    combined_data = []
     for c in selected_countries:
         hist_df = get_population_data(c)
         if hist_df.empty:
@@ -155,34 +157,64 @@ with tab4:
         mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
         hist_df = hist_df.loc[mask]
 
-        # Drop NA values for clean correlation
-        df_clean1 = hist_df[["median_age", "fertility_rate"]].dropna()
-        df_clean2 = hist_df[["median_age", "migrants"]].dropna()
+        hist_df["country"] = c
+        combined_data.append(hist_df)
 
-        if not df_clean1.empty:
-            r1 = np.corrcoef(df_clean1["median_age"], df_clean1["fertility_rate"])[0, 1]
-            fig_corr1 = go.Figure(go.Scatter(
-                x=df_clean1["median_age"], y=df_clean1["fertility_rate"],
+    if combined_data:
+        df_all = pd.concat(combined_data)
+
+        # --- Scatterplot 1: Median Age vs Fertility Rate ---
+        df1 = df_all[["median_age", "fertility_rate", "country"]].dropna()
+        fig1 = go.Figure()
+        for c in df1["country"].unique():
+            sub = df1[df1["country"] == c]
+            fig1.add_trace(go.Scatter(
+                x=sub["median_age"], y=sub["fertility_rate"],
                 mode="markers", name=c
             ))
-            fig_corr1.update_layout(
-                title=f"{c}: Median Age vs Fertility Rate (R={r1:.2f})",
-                xaxis_title="Median Age",
-                yaxis_title="Fertility Rate",
-                template="plotly_white"
-            )
-            st.plotly_chart(fig_corr1, use_container_width=True)
 
-        if not df_clean2.empty:
-            r2 = np.corrcoef(df_clean2["median_age"], df_clean2["migrants"])[0, 1]
-            fig_corr2 = go.Figure(go.Scatter(
-                x=df_clean2["median_age"], y=df_clean2["migrants"],
+        fig1.update_layout(
+            title="Median Age vs Fertility Rate",
+            xaxis_title="Median Age",
+            yaxis_title="Fertility Rate",
+            template="plotly_white",
+            height=600
+        )
+        st.plotly_chart(fig1, use_container_width=True)
+
+        # R values per country
+        r_values1 = []
+        for c in df1["country"].unique():
+            sub = df1[df1["country"] == c]
+            if len(sub) > 1:
+                r = np.corrcoef(sub["median_age"], sub["fertility_rate"])[0, 1]
+                r_values1.append({"Country": c, "R (Median Age vs Fertility Rate)": round(r, 2)})
+        st.dataframe(pd.DataFrame(r_values1).set_index("Country"))
+
+        # --- Scatterplot 2: Median Age vs Migrants ---
+        df2 = df_all[["median_age", "migrants", "country"]].dropna()
+        fig2 = go.Figure()
+        for c in df2["country"].unique():
+            sub = df2[df2["country"] == c]
+            fig2.add_trace(go.Scatter(
+                x=sub["median_age"], y=sub["migrants"],
                 mode="markers", name=c
             ))
-            fig_corr2.update_layout(
-                title=f"{c}: Median Age vs Migrants (R={r2:.2f})",
-                xaxis_title="Median Age",
-                yaxis_title="Migrants",
-                template="plotly_white"
-            )
-            st.plotly_chart(fig_corr2, use_container_width=True)
+
+        fig2.update_layout(
+            title="Median Age vs Migrants",
+            xaxis_title="Median Age",
+            yaxis_title="Migrants",
+            template="plotly_white",
+            height=600
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+
+        # R values per country
+        r_values2 = []
+        for c in df2["country"].unique():
+            sub = df2[df2["country"] == c]
+            if len(sub) > 1:
+                r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
+                r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
+        st.dataframe(pd.DataFrame(r_values2).set_index("Country"))
