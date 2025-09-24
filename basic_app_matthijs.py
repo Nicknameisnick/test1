@@ -188,7 +188,7 @@ with tab4:
         overall_r1 = np.corrcoef(df1["median_age"], df1["fertility_rate"])[0, 1]
         r_values1.append({"Country": "Overall", "R (Median Age vs Fertility Rate)": round(overall_r1, 2)})
 
-        st.dataframe(pd.DataFrame(r_values1).set_index("Country"), use_container_width=False)
+        st.dataframe(pd.DataFrame(r_values1).set_index("Country"), use_container_width=True)
 
         # ==============================
         # 2️⃣ Median Age vs Migrants
@@ -221,7 +221,7 @@ with tab4:
         overall_r2 = np.corrcoef(df2["median_age"], df2["migrants"])[0, 1]
         r_values2.append({"Country": "Overall", "R (Median Age vs Migrants)": round(overall_r2, 2)})
 
-        st.dataframe(pd.DataFrame(r_values2).set_index("Country"), use_container_width=False)
+        st.dataframe(pd.DataFrame(r_values2).set_index("Country"), use_container_width=True)
 
         # ==============================
         # 3️⃣ Median Age vs Urban Population %
@@ -254,7 +254,8 @@ with tab4:
         overall_r3 = np.corrcoef(df3["median_age"], df3["urban_population_pct"])[0, 1]
         r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": round(overall_r3, 2)})
 
-        st.dataframe(pd.DataFrame(r_values3).set_index("Country"), use_container_width=False)
+        st.dataframe(pd.DataFrame(r_values3).set_index("Country"), use_container_width=True)
+
 
 
 
