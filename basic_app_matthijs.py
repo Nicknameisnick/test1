@@ -157,15 +157,15 @@ with tab4:
     if combined_data:
         df_all = pd.concat(combined_data)
 
-        # --- Scatterplot 1: Median Age vs Fertility Rate ---
+        # ==============================
+        # 1️⃣ Median Age vs Fertility Rate
+        # ==============================
         df1 = df_all[["median_age", "fertility_rate", "country"]].dropna()
         fig1 = go.Figure()
         for c in df1["country"].unique():
             sub = df1[df1["country"] == c]
-            fig1.add_trace(go.Scatter(
-                x=sub["median_age"], y=sub["fertility_rate"],
-                mode="markers", name=c
-            ))
+            fig1.add_trace(go.Scatter(x=sub["median_age"], y=sub["fertility_rate"],
+                                      mode="markers", name=c))
 
         fig1.update_layout(
             title="Median Age vs Fertility Rate",
@@ -176,7 +176,7 @@ with tab4:
         )
         st.plotly_chart(fig1, use_container_width=True)
 
-        # R values per country + overall
+        # R values
         r_values1 = []
         for c in df1["country"].unique():
             sub = df1[df1["country"] == c]
@@ -184,26 +184,21 @@ with tab4:
                 r = np.corrcoef(sub["median_age"], sub["fertility_rate"])[0, 1]
                 r_values1.append({"Country": c, "R (Median Age vs Fertility Rate)": round(r, 2)})
 
-        # overall R
-        if len(df1) > 1:
-            r_overall = np.corrcoef(df1["median_age"], df1["fertility_rate"])[0, 1]
-            r_values1.append({"Country": "Overall", "R (Median Age vs Fertility Rate)": round(r_overall, 2)})
+        # Overall R
+        overall_r1 = np.corrcoef(df1["median_age"], df1["fertility_rate"])[0, 1]
+        r_values1.append({"Country": "Overall", "R (Median Age vs Fertility Rate)": round(overall_r1, 2)})
 
-        st.dataframe(
-            pd.DataFrame(r_values1).set_index("Country"),
-            use_container_width=True,
-            column_config={"Country": st.column_config.Column(width="medium")}
-        )
+        st.dataframe(pd.DataFrame(r_values1).set_index("Country"), use_container_width=True)
 
-        # --- Scatterplot 2: Median Age vs Migrants ---
+        # ==============================
+        # 2️⃣ Median Age vs Migrants
+        # ==============================
         df2 = df_all[["median_age", "migrants", "country"]].dropna()
         fig2 = go.Figure()
         for c in df2["country"].unique():
             sub = df2[df2["country"] == c]
-            fig2.add_trace(go.Scatter(
-                x=sub["median_age"], y=sub["migrants"],
-                mode="markers", name=c
-            ))
+            fig2.add_trace(go.Scatter(x=sub["median_age"], y=sub["migrants"],
+                                      mode="markers", name=c))
 
         fig2.update_layout(
             title="Median Age vs Migrants",
@@ -214,7 +209,7 @@ with tab4:
         )
         st.plotly_chart(fig2, use_container_width=True)
 
-        # R values per country + overall
+        # R values
         r_values2 = []
         for c in df2["country"].unique():
             sub = df2[df2["country"] == c]
@@ -222,25 +217,21 @@ with tab4:
                 r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
                 r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
 
-        if len(df2) > 1:
-            r_overall = np.corrcoef(df2["median_age"], df2["migrants"])[0, 1]
-            r_values2.append({"Country": "Overall", "R (Median Age vs Migrants)": round(r_overall, 2)})
+        # Overall R
+        overall_r2 = np.corrcoef(df2["median_age"], df2["migrants"])[0, 1]
+        r_values2.append({"Country": "Overall", "R (Median Age vs Migrants)": round(overall_r2, 2)})
 
-        st.dataframe(
-            pd.DataFrame(r_values2).set_index("Country"),
-            use_container_width=True,
-            column_config={"Country": st.column_config.Column(width="medium")}
-        )
+        st.dataframe(pd.DataFrame(r_values2).set_index("Country"), use_container_width=True)
 
-        # --- Scatterplot 3: Median Age vs Urban Population % ---
+        # ==============================
+        # 3️⃣ Median Age vs Urban Population %
+        # ==============================
         df3 = df_all[["median_age", "urban_population_pct", "country"]].dropna()
         fig3 = go.Figure()
         for c in df3["country"].unique():
             sub = df3[df3["country"] == c]
-            fig3.add_trace(go.Scatter(
-                x=sub["median_age"], y=sub["urban_population_pct"],
-                mode="markers", name=c
-            ))
+            fig3.add_trace(go.Scatter(x=sub["median_age"], y=sub["urban_population_pct"],
+                                      mode="markers", name=c))
 
         fig3.update_layout(
             title="Median Age vs Urban Population %",
@@ -251,7 +242,7 @@ with tab4:
         )
         st.plotly_chart(fig3, use_container_width=True)
 
-        # R values per country + overall
+        # R values
         r_values3 = []
         for c in df3["country"].unique():
             sub = df3[df3["country"] == c]
@@ -259,16 +250,11 @@ with tab4:
                 r = np.corrcoef(sub["median_age"], sub["urban_population_pct"])[0, 1]
                 r_values3.append({"Country": c, "R (Median Age vs Urban Pop. %)": round(r, 2)})
 
-        if len(df3) > 1:
-            r_overall = np.corrcoef(df3["median_age"], df3["urban_population_pct"])[0, 1]
-            r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": round(r_overall, 2)})
+        # Overall R
+        overall_r3 = np.corrcoef(df3["median_age"], df3["urban_population_pct"])[0, 1]
+        r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": round(overall_r3, 2)})
 
-        st.dataframe(
-            pd.DataFrame(r_values3).set_index("Country"),
-            use_container_width=True,
-            column_config={"Country": st.column_config.Column(width="medium")}
-        )
-
+        st.dataframe(pd.DataFrame(r_values3).set_index("Country"), use_container_width=True)
 
 
 
