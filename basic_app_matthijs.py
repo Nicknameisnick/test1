@@ -62,7 +62,105 @@ st.markdown(
     These countries play a key role in global economic governance, trade policy, and international relations.  
     """
 )
+# Main content - Tabs
+tab1, tab2, tab3 = st.tabs(["📊 G7 Comparison", "📈 Individual Charts", "📋 Data Tables"]
 
+with tab1:
+    st.subheader(f"G7 Comparison: {selected_metric.replace('_', ' ').title()}")
+    # 1️⃣ Population Trends
+fig_pop = go.Figure()
+for c in selected_countries:
+    hist_df = get_population_data(c)
+    if not hist_df.empty:
+        mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+        hist_df = hist_df.loc[mask]
+
+        if not hist_df.empty:
+            mode = (
+                "lines+markers"
+                if (show_lines and show_points)
+                else "lines"
+                if show_lines
+                else "markers"
+            )
+            fig_pop.add_trace(go.Scatter(x=hist_df.index, y=hist_df["population"],
+                                         mode=mode, name=c))
+
+fig_pop.update_layout(
+    title="Population Trends of G7 Countries",
+    xaxis_title="Year",
+    yaxis_title="Population",
+    height=600,
+    width=1100,
+    template="plotly_white"
+)
+st.plotly_chart(fig_pop, use_container_width=True)
+    fig = create_g7_comparison_chart(...)
+    st.plotly_chart(fig, use_container_width=True)
+
+
+
+with tab2:
+    st.subheader("Individual Country Charts")
+   fig_mig = go.Figure()
+data_found = False  # track if any migrants data exists
+for c in selected_countries:
+    hist_df = get_population_data(c)
+    if not hist_df.empty:
+        mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+        hist_df = hist_df.loc[mask]
+
+        if "migrants" in hist_df.columns and hist_df["migrants"].notna().any():
+            data_found = True
+            fig_mig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["migrants"],
+                                         mode="lines+markers", name=c))
+
+if data_found:
+    fig_mig.update_layout(
+        title="Migrants Over Time",
+        xaxis_title="Year",
+        yaxis_title="Number of Migrants",
+        height=500,
+        width=1100,
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_mig, use_container_width=True)
+    cols = st.columns(2)
+    # ... meer code
+
+with tab3:
+    st.subheader("Raw Data Tables")
+    #3 median age over time (scatterplot)
+fig_pop = go.Figure()
+for c in selected_countries:
+    hist_df = get_population_data(c)
+    if not hist_df.empty:
+        mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+        hist_df = hist_df.loc[mask]
+
+        if not hist_df.empty:
+            mode = (
+                "lines+markers"
+                if (show_lines and show_points)
+                else "lines"
+                if show_lines
+                else "markers"
+            )
+            fig_pop.add_trace(go.Scatter(x=hist_df.index, y=hist_df["median_age"],
+                                         mode=mode, name=c))
+
+fig_pop.update_layout(
+    title="Median age of G7 Countries",
+    xaxis_title="Year",
+    yaxis_title="Median age",
+    height=600,
+    width=1100,
+    template="plotly_white"
+)
+st.plotly_chart(fig_pop, use_container_width=True)
+
+
+'''
 # 1️⃣ Population Trends
 fig_pop = go.Figure()
 for c in selected_countries:
@@ -91,8 +189,8 @@ fig_pop.update_layout(
     template="plotly_white"
 )
 st.plotly_chart(fig_pop, use_container_width=True)
-
-
+'''
+'''
 # Migrants over time (line plot)
 fig_mig = go.Figure()
 data_found = False  # track if any migrants data exists
@@ -117,7 +215,8 @@ if data_found:
         template="plotly_white"
     )
     st.plotly_chart(fig_mig, use_container_width=True)
-
+'''
+'''
 #3 median age over time (scatterplot)
 fig_pop = go.Figure()
 for c in selected_countries:
@@ -146,6 +245,7 @@ fig_pop.update_layout(
     template="plotly_white"
 )
 st.plotly_chart(fig_pop, use_container_width=True)
+'''
 
 
 
