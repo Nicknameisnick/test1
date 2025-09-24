@@ -23,7 +23,6 @@ def get_population_data(country_name):
             hist_df = hist_df.set_index("year")
             hist_df.index = hist_df.index.astype(int)
 
-            # Ensure optional columns always exist
             for col in ["migrants", "fertility_rate", "median_age"]:
                 if col not in hist_df.columns:
                     hist_df[col] = None
@@ -214,6 +213,7 @@ with tab4:
                 r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
                 r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
         st.dataframe(pd.DataFrame(r_values2).set_index("Country"))
+
 
 
 
