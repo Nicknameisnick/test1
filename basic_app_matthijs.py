@@ -63,7 +63,7 @@ st.markdown(
     """
 )
 # Main content - Tabs
-tab1, tab2, tab3 = st.tabs(["📊 G7 Comparison", "📈 Individual Charts", "📋 Data Tables"]
+tab1, tab2, tab3 = st.tabs(["📊 G7 Comparison", "📈 Individual Charts", "📋 Data Tables"])
 
 with tab1:
     st.subheader(f"G7 Comparison: {selected_metric.replace('_', ' ').title()}")
@@ -246,6 +246,7 @@ fig_pop.update_layout(
 )
 st.plotly_chart(fig_pop, use_container_width=True)
 '''
+
 
 
 
