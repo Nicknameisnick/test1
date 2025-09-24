@@ -22,7 +22,7 @@ def get_population_data(country_name):
             hist_df = hist_df.set_index("year")
             hist_df.index = hist_df.index.astype(int)
 
-            # ✅ Ensure "migrants" column always exists
+            # Ensure "migrants" column always exists
             if "migrants" not in hist_df.columns:
                 hist_df["migrants"] = None
     return hist_df
@@ -33,7 +33,7 @@ def get_population_data(country_name):
 # -------------------------------
 st.sidebar.title("Controls")
 
-year_range = st.sidebar.slider("Select Year Range", 1950, 2025, (1970, 2020))
+year_range = st.sidebar.slider("Select Year Range", 1950, 2025, (1950, 2025))
 select_all = st.sidebar.toggle("Select/Deselect All Countries", value=True)
 
 countries = [
@@ -53,7 +53,7 @@ show_points = st.sidebar.checkbox("Show Points", value=True)
 # -------------------------------
 # Main content
 # -------------------------------
-st.title("📊 G7 Population Dashboard")
+st.title(" G7 Population Dashboard")
 
 st.markdown(
     """
@@ -93,7 +93,7 @@ fig_pop.update_layout(
 st.plotly_chart(fig_pop, use_container_width=True)
 
 
-# 2️⃣ Migrants over time (line plot)
+# Migrants over time (line plot)
 fig_mig = go.Figure()
 data_found = False  # track if any migrants data exists
 for c in selected_countries:
@@ -119,6 +119,7 @@ if data_found:
     st.plotly_chart(fig_mig, use_container_width=True)
 else:
     st.warning("⚠️ No migrants data available from the API for the selected countries and years.")
+
 
 
 
