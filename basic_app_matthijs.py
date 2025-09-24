@@ -157,7 +157,7 @@ with tab4:
     if combined_data:
         df_all = pd.concat(combined_data)
 
-        # Scatterplot 1: Median Age vs Fertility Rate 
+        # --- Scatterplot 1: Median Age vs Fertility Rate ---
         df1 = df_all[["median_age", "fertility_rate", "country"]].dropna()
         fig1 = go.Figure()
         for c in df1["country"].unique():
@@ -185,7 +185,7 @@ with tab4:
                 r_values1.append({"Country": c, "R (Median Age vs Fertility Rate)": round(r, 2)})
         st.dataframe(pd.DataFrame(r_values1).set_index("Country"))
 
-        # Scatterplot 2: Median Age vs Migrants 
+        # --- Scatterplot 2: Median Age vs Migrants ---
         df2 = df_all[["median_age", "migrants", "country"]].dropna()
         fig2 = go.Figure()
         for c in df2["country"].unique():
@@ -212,6 +212,36 @@ with tab4:
                 r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
                 r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
         st.dataframe(pd.DataFrame(r_values2).set_index("Country"))
+
+        # --- Scatterplot 3: Median Age vs Urban Population % ---
+        df3 = df_all[["median_age", "urban_population_pct", "country"]].dropna()
+        fig3 = go.Figure()
+        for c in df3["country"].unique():
+            sub = df3[df3["country"] == c]
+            fig3.add_trace(go.Scatter(
+                x=sub["median_age"], y=sub["urban_population_pct"],
+                mode="markers", name=c
+            ))
+
+        fig3.update_layout(
+            title="Median Age vs Urban Population %",
+            xaxis_title="Median Age",
+            yaxis_title="Urban Population (%)",
+            template="plotly_white",
+            height=600
+        )
+        st.plotly_chart(fig3, use_container_width=True)
+
+        # R values per country
+        r_values3 = []
+        for c in df3["country"].unique():
+            sub = df3[df3["country"] == c]
+            if len(sub) > 1:
+                r = np.corrcoef(sub["median_age"], sub["urban_population_pct"])[0, 1]
+                r_values3.append({"Country": c, "R (Median Age vs Urban Pop. %)": round(r, 2)})
+        st.dataframe(pd.DataFrame(r_values3).set_index("Country"))
+
+
 
 
 
