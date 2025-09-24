@@ -254,7 +254,8 @@ with tab4:
         overall_r3 = np.corrcoef(df3["median_age"], df3["urban_population_pct"])[0, 1]
         r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": round(overall_r3, 2)})
 
-        st.dataframe(pd.DataFrame(r_values3).set_index("Country"), use_container_width=True)
+        st.dataframe(pd.DataFrame(r_values3).set_index("Country"), use_container_width=False)
+
 
 
 
