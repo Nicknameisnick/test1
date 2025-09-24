@@ -11,7 +11,7 @@ st.set_page_config(page_title="G7 Population Dashboard", layout="wide")
 
 def get_population_data(country_name):
     url = f"https://api.api-ninjas.com/v1/population?country={country_name}"
-    headers = {"X-Api-Key": "WXpLhqoFwtWNQK/4yBAnLQ==Dr4y3QC5e0OOcSpn"} 
+    headers = {"X-Api-Key": "ctncIeEoDtS4xty3k/0f2A==gruY3Np8xYnobhv5"} 
     response = requests.get(url, headers=headers)
 
     hist_df = pd.DataFrame()
@@ -214,5 +214,6 @@ with tab4:
                 r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
                 r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
         st.dataframe(pd.DataFrame(r_values2).set_index("Country"))
+
 
 
