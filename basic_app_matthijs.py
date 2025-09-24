@@ -28,25 +28,35 @@ def get_population_data(country_name):
                     hist_df[col] = None
     return hist_df
 
+
 # Sidebar controls
 
 st.sidebar.title("Controls")
 
 year_range = st.sidebar.slider("Select Year Range", 1950, 2025, (1950, 2025))
-select_all = st.sidebar.toggle("Select/Deselect All Countries", value=True)
 
 countries = [
     "Canada", "France", "Germany", "Italy", "Japan",
     "United Kingdom", "United States of America"
 ]
 
-if select_all:
-    selected_countries = st.sidebar.multiselect("Select Countries", countries, default=countries)
-else:
-    selected_countries = st.sidebar.multiselect("Select Countries", countries, default=[])
+if "selected_countries" not in st.session_state:
+    st.session_state.selected_countries = countries.copy()  # default all selected
 
-show_lines = st.sidebar.checkbox("Show Lines", value=True)
-show_points = st.sidebar.checkbox("Show Points", value=True)
+if st.sidebar.button("Select All Countries"):
+    st.session_state.selected_countries = countries.copy()
+
+if st.sidebar.button("Clear All Countries"):
+    st.session_state.selected_countries = []
+
+selected_countries = st.sidebar.multiselect(
+    "Select Countries",
+    countries,
+    default=st.session_state.selected_countries
+)
+
+# Keep session_state in sync if user changes selection manually
+st.session_state.selected_countries = selected_countries
 
 
 # Tabs for different plots
@@ -213,6 +223,7 @@ with tab4:
                 r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
                 r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
         st.dataframe(pd.DataFrame(r_values2).set_index("Country"))
+
 
 
 
