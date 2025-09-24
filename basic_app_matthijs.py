@@ -117,8 +117,36 @@ if data_found:
         template="plotly_white"
     )
     st.plotly_chart(fig_mig, use_container_width=True)
-else:
-    st.warning("⚠️ No migrants data available from the API for the selected countries and years.")
+
+#3 median age over time (scatterplot)
+fig_pop = go.Figure()
+for c in selected_countries:
+    hist_df = get_population_data(c)
+    if not hist_df.empty:
+        mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+        hist_df = hist_df.loc[mask]
+
+        if not hist_df.empty:
+            mode = (
+                "lines+markers"
+                if (show_lines and show_points)
+                else "lines"
+                if show_lines
+                else "markers"
+            )
+            fig_pop.add_trace(go.Scatter(x=hist_df.index, y=hist_df["median_age"],
+                                         mode=mode, name=c))
+
+fig_pop.update_layout(
+    title="Population Trends of G7 Countries",
+    xaxis_title="Year",
+    yaxis_title="Median age",
+    height=600,
+    width=1100,
+    template="plotly_white"
+)
+st.plotly_chart(fig_pop, use_container_width=True)
+
 
 
 
