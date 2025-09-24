@@ -67,37 +67,38 @@ tab1, tab2, tab3 = st.tabs(["📊 G7 Comparison", "📈 Individual Charts", "�
 
 with tab1:
     st.subheader(f"G7 Comparison: {selected_metric.replace('_', ' ').title()}")
-    # 1️⃣ Population Trends
-fig_pop = go.Figure()
-for c in selected_countries:
-    hist_df = get_population_data(c)
-    if not hist_df.empty:
-        mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
-        hist_df = hist_df.loc[mask]
 
+    fig = go.Figure()
+    for c in selected_countries:
+        hist_df = get_population_data(c)
         if not hist_df.empty:
-            mode = (
-                "lines+markers"
-                if (show_lines and show_points)
-                else "lines"
-                if show_lines
-                else "markers"
-            )
-            fig_pop.add_trace(go.Scatter(x=hist_df.index, y=hist_df["population"],
-                                         mode=mode, name=c))
+            mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+            hist_df = hist_df.loc[mask]
 
-fig_pop.update_layout(
-    title="Population Trends of G7 Countries",
-    xaxis_title="Year",
-    yaxis_title="Population",
-    height=600,
-    width=1100,
-    template="plotly_white"
-)
-st.plotly_chart(fig_pop, use_container_width=True)
-    fig = create_g7_comparison_chart(...)
+            if selected_metric in hist_df.columns:
+                mode = (
+                    "lines+markers"
+                    if (show_lines and show_points)
+                    else "lines"
+                    if show_lines
+                    else "markers"
+                )
+                fig.add_trace(go.Scatter(
+                    x=hist_df.index,
+                    y=hist_df[selected_metric],
+                    mode=mode,
+                    name=c
+                ))
+
+    fig.update_layout(
+        title=f"{selected_metric.replace('_', ' ').title()} Trends of G7 Countries",
+        xaxis_title="Year",
+        yaxis_title=selected_metric.replace('_', ' ').title(),
+        height=600,
+        width=1100,
+        template="plotly_white"
+    )
     st.plotly_chart(fig, use_container_width=True)
-
 
 
 with tab2:
@@ -246,6 +247,7 @@ fig_pop.update_layout(
 )
 st.plotly_chart(fig_pop, use_container_width=True)
 '''
+
 
 
 
