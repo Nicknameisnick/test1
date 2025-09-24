@@ -7,9 +7,8 @@ import numpy as np
 
 st.set_page_config(page_title="G7 Population Dashboard", layout="wide")
 
-# -------------------------------
 # Function to get population data
-# -------------------------------
+
 def get_population_data(country_name):
     url = f"https://api.api-ninjas.com/v1/population?country={country_name}"
     headers = {"X-Api-Key": "WXpLhqoFwtWNQK/4yBAnLQ==Dr4y3QC5e0OOcSpn"} 
@@ -30,10 +29,8 @@ def get_population_data(country_name):
                     hist_df[col] = None
     return hist_df
 
-
-# -------------------------------
 # Sidebar controls
-# -------------------------------
+
 st.sidebar.title("Controls")
 
 year_range = st.sidebar.slider("Select Year Range", 1950, 2025, (1950, 2025))
@@ -53,9 +50,8 @@ show_lines = st.sidebar.checkbox("Show Lines", value=True)
 show_points = st.sidebar.checkbox("Show Points", value=True)
 
 
-# -------------------------------
 # Tabs for different plots
-# -------------------------------
+
 tab1, tab2, tab3, tab4 = st.tabs(["Population Trends", "Migrants Over Time", "Median Age", "Correlation for Median Age"])
 
 with tab1:
@@ -163,7 +159,7 @@ with tab4:
     if combined_data:
         df_all = pd.concat(combined_data)
 
-        # --- Scatterplot 1: Median Age vs Fertility Rate ---
+        # Scatterplot 1: Median Age vs Fertility Rate 
         df1 = df_all[["median_age", "fertility_rate", "country"]].dropna()
         fig1 = go.Figure()
         for c in df1["country"].unique():
@@ -191,7 +187,7 @@ with tab4:
                 r_values1.append({"Country": c, "R (Median Age vs Fertility Rate)": round(r, 2)})
         st.dataframe(pd.DataFrame(r_values1).set_index("Country"))
 
-        # --- Scatterplot 2: Median Age vs Migrants ---
+        # Scatterplot 2: Median Age vs Migrants 
         df2 = df_all[["median_age", "migrants", "country"]].dropna()
         fig2 = go.Figure()
         for c in df2["country"].unique():
@@ -218,4 +214,5 @@ with tab4:
                 r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
                 r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
         st.dataframe(pd.DataFrame(r_values2).set_index("Country"))
+
 
