@@ -79,6 +79,7 @@ with tab1:
         width=1100,
         template="plotly_white"
     )
+    fig_pop.update_xaxes(dtick=5)
     st.plotly_chart(fig_pop, use_container_width=True)
 
 
@@ -105,6 +106,7 @@ with tab2:
             width=1100,
             template="plotly_white"
         )
+        fig_pop.update_xaxes(dtick=5)
         st.plotly_chart(fig_mig, use_container_width=True)
 
 
@@ -135,6 +137,7 @@ with tab3:
         width=1100,
         template="plotly_white"
     )
+    fig_pop.update_xaxes(dtick=5)
     st.plotly_chart(fig_age, use_container_width=True)
 
 
@@ -249,6 +252,7 @@ with tab4:
         r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": round(overall_r3, 2)})
 
         st.dataframe(pd.DataFrame(r_values3).set_index("Country"), use_container_width=True)
+
 
 
 
