@@ -56,7 +56,7 @@ show_points = st.sidebar.checkbox("Show Points", value=True)
 # -------------------------------
 # Tabs for different plots
 # -------------------------------
-tab1, tab2, tab3, tab4 = st.tabs(["Population Trends", "Migrants Over Time", "Median Age", "Correlations"])
+tab1, tab2, tab3, tab4 = st.tabs(["Population Trends", "Migrants Over Time", "Median Age", "Correlation for Median Age"])
 
 with tab1:
     st.subheader("Population Trends of G7 Countries")
@@ -218,3 +218,4 @@ with tab4:
                 r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
                 r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
         st.dataframe(pd.DataFrame(r_values2).set_index("Country"))
+
