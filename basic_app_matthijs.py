@@ -5,9 +5,8 @@ import plotly.graph_objects as go
 
 st.set_page_config(page_title="G7 Population Dashboard", layout="wide")
 
-# -------------------------------
 # Function to get population data
-# -------------------------------
+
 def get_population_data(country_name):
     url = f"https://api.api-ninjas.com/v1/population?country={country_name}"
     headers = {"X-Api-Key": "WXpLhqoFwtWNQK/4yBAnLQ==Dr4y3QC5e0OOcSpn"} 
@@ -28,9 +27,8 @@ def get_population_data(country_name):
     return hist_df
 
 
-# -------------------------------
 # Sidebar controls
-# -------------------------------
+
 st.sidebar.title("Controls")
 
 year_range = st.sidebar.slider("Select Year Range", 1950, 2025, (1950, 2025))
@@ -50,9 +48,8 @@ show_lines = st.sidebar.checkbox("Show Lines", value=True)
 show_points = st.sidebar.checkbox("Show Points", value=True)
 
 
-# -------------------------------
 # Main content
-# -------------------------------
+
 st.title(" G7 Population Dashboard")
 
 st.markdown(
@@ -63,13 +60,13 @@ st.markdown(
     """
 )
 
-# -------------------------------
+
 # Tabs
-# -------------------------------
+
 tab1, tab2, tab3 = st.tabs(["Population Trends", "Migrants Over Time", "Median Age Trends"])
 
 
-# 📊 Population Trends
+#Population Trends
 with tab1:
     fig_pop = go.Figure()
     for c in selected_countries:
@@ -100,7 +97,7 @@ with tab1:
     st.plotly_chart(fig_pop, use_container_width=True)
 
 
-# 🌍 Migrants Over Time
+#Migrants Over Time
 with tab2:
     fig_mig = go.Figure()
     data_found = False  # track if any migrants data exists
@@ -129,7 +126,7 @@ with tab2:
         st.info("No migrant data available for the selected countries and range.")
 
 
-# 👶 Median Age Trends
+#Median Age Trends
 with tab3:
     fig_age = go.Figure()
     for c in selected_countries:
@@ -158,3 +155,4 @@ with tab3:
         template="plotly_white"
     )
     st.plotly_chart(fig_age, use_container_width=True)
+
