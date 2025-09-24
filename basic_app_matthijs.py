@@ -66,7 +66,7 @@ st.markdown(
 tab1, tab2, tab3 = st.tabs(["Population Trends", "Migrants Over Time", "Median Age Trends"])
 
 
-#Population Trends
+# Population Trends
 with tab1:
     fig_pop = go.Figure()
     for c in selected_countries:
@@ -97,7 +97,7 @@ with tab1:
     st.plotly_chart(fig_pop, use_container_width=True)
 
 
-#Migrants Over Time
+# Migrants Over Time
 with tab2:
     fig_mig = go.Figure()
     data_found = False  # track if any migrants data exists
@@ -126,7 +126,7 @@ with tab2:
         st.info("No migrant data available for the selected countries and range.")
 
 
-#Median Age Trends
+# Median Age Trends
 with tab3:
     fig_age = go.Figure()
     for c in selected_countries:
@@ -155,4 +155,5 @@ with tab3:
         template="plotly_white"
     )
     st.plotly_chart(fig_age, use_container_width=True)
+
 
