@@ -63,97 +63,98 @@ st.markdown(
     """
 )
 
-# 1️⃣ Population Trends
-fig_pop = go.Figure()
-for c in selected_countries:
-    hist_df = get_population_data(c)
-    if not hist_df.empty:
-        mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
-        hist_df = hist_df.loc[mask]
+# -------------------------------
+# Tabs
+# -------------------------------
+tab1, tab2, tab3 = st.tabs(["Population Trends", "Migrants Over Time", "Median Age Trends"])
 
+
+# 📊 Population Trends
+with tab1:
+    fig_pop = go.Figure()
+    for c in selected_countries:
+        hist_df = get_population_data(c)
         if not hist_df.empty:
-            mode = (
-                "lines+markers"
-                if (show_lines and show_points)
-                else "lines"
-                if show_lines
-                else "markers"
-            )
-            fig_pop.add_trace(go.Scatter(x=hist_df.index, y=hist_df["population"],
-                                         mode=mode, name=c))
+            mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+            hist_df = hist_df.loc[mask]
 
-fig_pop.update_layout(
-    title="Population Trends of G7 Countries",
-    xaxis_title="Year",
-    yaxis_title="Population",
-    height=600,
-    width=1100,
-    template="plotly_white"
-)
-st.plotly_chart(fig_pop, use_container_width=True)
+            if not hist_df.empty:
+                mode = (
+                    "lines+markers"
+                    if (show_lines and show_points)
+                    else "lines"
+                    if show_lines
+                    else "markers"
+                )
+                fig_pop.add_trace(go.Scatter(x=hist_df.index, y=hist_df["population"],
+                                             mode=mode, name=c))
 
-
-# Migrants over time (line plot)
-fig_mig = go.Figure()
-data_found = False  # track if any migrants data exists
-for c in selected_countries:
-    hist_df = get_population_data(c)
-    if not hist_df.empty:
-        mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
-        hist_df = hist_df.loc[mask]
-
-        if "migrants" in hist_df.columns and hist_df["migrants"].notna().any():
-            data_found = True
-            fig_mig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["migrants"],
-                                         mode="lines+markers", name=c))
-
-if data_found:
-    fig_mig.update_layout(
-        title="Migrants Over Time",
+    fig_pop.update_layout(
+        title="Population Trends of G7 Countries",
         xaxis_title="Year",
-        yaxis_title="Number of Migrants",
-        height=500,
+        yaxis_title="Population",
+        height=600,
         width=1100,
         template="plotly_white"
     )
-    st.plotly_chart(fig_mig, use_container_width=True)
+    st.plotly_chart(fig_pop, use_container_width=True)
 
-#3 median age over time (scatterplot)
-fig_pop = go.Figure()
-for c in selected_countries:
-    hist_df = get_population_data(c)
-    if not hist_df.empty:
-        mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
-        hist_df = hist_df.loc[mask]
 
+# 🌍 Migrants Over Time
+with tab2:
+    fig_mig = go.Figure()
+    data_found = False  # track if any migrants data exists
+    for c in selected_countries:
+        hist_df = get_population_data(c)
         if not hist_df.empty:
-            mode = (
-                "lines+markers"
-                if (show_lines and show_points)
-                else "lines"
-                if show_lines
-                else "markers"
-            )
-            fig_pop.add_trace(go.Scatter(x=hist_df.index, y=hist_df["median_age"],
-                                         mode=mode, name=c))
+            mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+            hist_df = hist_df.loc[mask]
 
-fig_pop.update_layout(
-    title="Median age of G7 Countries",
-    xaxis_title="Year",
-    yaxis_title="Median age",
-    height=600,
-    width=1100,
-    template="plotly_white"
-)
-st.plotly_chart(fig_pop, use_container_width=True)
+            if "migrants" in hist_df.columns and hist_df["migrants"].notna().any():
+                data_found = True
+                fig_mig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["migrants"],
+                                             mode="lines+markers", name=c))
 
-
-
+    if data_found:
+        fig_mig.update_layout(
+            title="Migrants Over Time",
+            xaxis_title="Year",
+            yaxis_title="Number of Migrants",
+            height=500,
+            width=1100,
+            template="plotly_white"
+        )
+        st.plotly_chart(fig_mig, use_container_width=True)
+    else:
+        st.info("No migrant data available for the selected countries and range.")
 
 
+# 👶 Median Age Trends
+with tab3:
+    fig_age = go.Figure()
+    for c in selected_countries:
+        hist_df = get_population_data(c)
+        if not hist_df.empty:
+            mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
+            hist_df = hist_df.loc[mask]
 
+            if not hist_df.empty and "median_age" in hist_df.columns:
+                mode = (
+                    "lines+markers"
+                    if (show_lines and show_points)
+                    else "lines"
+                    if show_lines
+                    else "markers"
+                )
+                fig_age.add_trace(go.Scatter(x=hist_df.index, y=hist_df["median_age"],
+                                             mode=mode, name=c))
 
-
-
-
-
+    fig_age.update_layout(
+        title="Median Age of G7 Countries",
+        xaxis_title="Year",
+        yaxis_title="Median Age",
+        height=600,
+        width=1100,
+        template="plotly_white"
+    )
+    st.plotly_chart(fig_age, use_container_width=True)
