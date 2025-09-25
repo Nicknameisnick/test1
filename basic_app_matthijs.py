@@ -7,7 +7,6 @@ import numpy as np
 st.set_page_config(page_title="G7 Population Dashboard", layout="wide")
 
 # Function to get population data
-
 def get_population_data(country_name):
     url = f"https://api.api-ninjas.com/v1/population?country={country_name}"
     headers = {"X-Api-Key": "ctncIeEoDtS4xty3k/0f2A==gruY3Np8xYnobhv5"} 
@@ -22,13 +21,22 @@ def get_population_data(country_name):
             hist_df = hist_df.set_index("year")
             hist_df.index = hist_df.index.astype(int)
 
-            for col in ["migrants", "fertility_rate", "median_age"]:
+            for col in ["migrants", "fertility_rate", "median_age", "urban_population_pct"]:
                 if col not in hist_df.columns:
                     hist_df[col] = None
     return hist_df
 
-# Sidebar controls
+# safe Pearson r helper
+def pearsonr_safe(x, y):
+    """Return Pearson r or np.nan if not enough valid points."""
+    xa = pd.to_numeric(x, errors="coerce").to_numpy()
+    ya = pd.to_numeric(y, errors="coerce").to_numpy()
+    mask = ~np.isnan(xa) & ~np.isnan(ya)
+    if mask.sum() < 2:
+        return np.nan
+    return float(np.corrcoef(xa[mask], ya[mask])[0, 1])
 
+# Sidebar controls
 st.sidebar.title("Controls")
 
 year_range = st.sidebar.slider("Select Year Range", 1950, 2025, (1950, 2025))
@@ -47,9 +55,7 @@ else:
 show_lines = st.sidebar.checkbox("Show Lines", value=True)
 show_points = st.sidebar.checkbox("Show Points", value=True)
 
-
 # Tabs for different plots
-
 tab1, tab2, tab3, tab4 = st.tabs(["Population Trends", "Migrants Over Time", "Median Age", "Correlation for Median Age"])
 
 with tab1:
@@ -82,7 +88,6 @@ with tab1:
     fig_pop.update_xaxes(dtick=5)
     st.plotly_chart(fig_pop, use_container_width=True)
 
-
 with tab2:
     st.subheader("Migrants Over Time")
     fig_mig = go.Figure()
@@ -107,8 +112,17 @@ with tab2:
             template="plotly_white"
         )
         fig_mig.update_xaxes(dtick=5)
-        st.plotly_chart(fig_mig, use_container_width=True)
-
+    else:
+        # keep empty but labeled axes so the plot doesn't "disappear"
+        fig_mig.update_layout(
+            title="Migrants Over Time (no data selected)",
+            xaxis_title="Year",
+            yaxis_title="Number of Migrants",
+            height=500,
+            width=1100,
+            template="plotly_white"
+        )
+    st.plotly_chart(fig_mig, use_container_width=True)
 
 with tab3:
     st.subheader("Median Age of G7 Countries")
@@ -144,7 +158,7 @@ with tab3:
 with tab4:
     st.subheader("Correlations Across G7 Countries")
 
-    # Collect combined data
+    # Collect combined data (keep empty df if nothing selected)
     combined_data = []
     for c in selected_countries:
         hist_df = get_population_data(c)
@@ -159,105 +173,91 @@ with tab4:
 
     if combined_data:
         df_all = pd.concat(combined_data)
-        # Median Age vs Fertility Rate
-        df1 = df_all[["median_age", "fertility_rate", "country"]].dropna()
-        fig1 = go.Figure()
-        for c in df1["country"].unique():
-            sub = df1[df1["country"] == c]
-            fig1.add_trace(go.Scatter(x=sub["median_age"], y=sub["fertility_rate"],
-                                      mode="markers", name=c))
+    else:
+        # create empty df with expected columns to allow plotting empty figures
+        df_all = pd.DataFrame(columns=[
+            "median_age", "fertility_rate", "migrants", "urban_population_pct", "country"
+        ])
 
-        fig1.update_layout(
-            title="Median Age vs Fertility Rate",
-            xaxis_title="Median Age",
-            yaxis_title="Fertility Rate",
-            template="plotly_white",
-            height=600
-        )
-        st.plotly_chart(fig1, use_container_width=True)
+    # --- Plot 1: Median Age vs Fertility Rate (all countries on same plot) ---
+    df1 = df_all[["median_age", "fertility_rate", "country"]].dropna()
+    fig1 = go.Figure()
+    for c in df1["country"].unique():
+        sub = df1[df1["country"] == c]
+        fig1.add_trace(go.Scatter(x=sub["median_age"], y=sub["fertility_rate"],
+                                  mode="markers", name=c))
+    fig1.update_layout(
+        title="Median Age vs Fertility Rate",
+        xaxis_title="Median Age",
+        yaxis_title="Fertility Rate",
+        template="plotly_white",
+        height=600
+    )
+    st.plotly_chart(fig1, use_container_width=True)
 
-        # R values
-        r_values1 = []
-        for c in df1["country"].unique():
-            sub = df1[df1["country"] == c]
-            if len(sub) > 1:
-                r = np.corrcoef(sub["median_age"], sub["fertility_rate"])[0, 1]
-                r_values1.append({"Country": c, "R (Median Age vs Fertility Rate)": round(r, 2)})
+    # R values per country (safe) + overall
+    r_values1 = []
+    for c in sorted(df1["country"].unique()):
+        sub = df1[df1["country"] == c]
+        r = pearsonr_safe(sub["median_age"], sub["fertility_rate"])
+        # only include country row if at least 1 observation (show NaN if <2)
+        r_values1.append({"Country": c, "R (Median Age vs Fertility Rate)": (round(r, 2) if not np.isnan(r) else np.nan)})
 
-        # Overall R
-        overall_r1 = np.corrcoef(df1["median_age"], df1["fertility_rate"])[0, 1]
-        r_values1.append({"Country": "Overall", "R (Median Age vs Fertility Rate)": round(overall_r1, 2)})
+    overall_r1 = pearsonr_safe(df1["median_age"], df1["fertility_rate"])
+    r_values1.append({"Country": "Overall", "R (Median Age vs Fertility Rate)": (round(overall_r1, 2) if not np.isnan(overall_r1) else np.nan)})
 
-        st.dataframe(pd.DataFrame(r_values1).set_index("Country"), use_container_width=True)
+    st.dataframe(pd.DataFrame(r_values1).set_index("Country"), use_container_width=True)
 
-        # Median Age vs Migrants
-        df2 = df_all[["median_age", "migrants", "country"]].dropna()
-        fig2 = go.Figure()
-        for c in df2["country"].unique():
-            sub = df2[df2["country"] == c]
-            fig2.add_trace(go.Scatter(x=sub["median_age"], y=sub["migrants"],
-                                      mode="markers", name=c))
+    # --- Plot 2: Median Age vs Migrants ---
+    df2 = df_all[["median_age", "migrants", "country"]].dropna()
+    fig2 = go.Figure()
+    for c in df2["country"].unique():
+        sub = df2[df2["country"] == c]
+        fig2.add_trace(go.Scatter(x=sub["median_age"], y=sub["migrants"],
+                                  mode="markers", name=c))
+    fig2.update_layout(
+        title="Median Age vs Migrants",
+        xaxis_title="Median Age",
+        yaxis_title="Migrants",
+        template="plotly_white",
+        height=600
+    )
+    st.plotly_chart(fig2, use_container_width=True)
 
-        fig2.update_layout(
-            title="Median Age vs Migrants",
-            xaxis_title="Median Age",
-            yaxis_title="Migrants",
-            template="plotly_white",
-            height=600
-        )
-        st.plotly_chart(fig2, use_container_width=True)
+    r_values2 = []
+    for c in sorted(df2["country"].unique()):
+        sub = df2[df2["country"] == c]
+        r = pearsonr_safe(sub["median_age"], sub["migrants"])
+        r_values2.append({"Country": c, "R (Median Age vs Migrants)": (round(r, 2) if not np.isnan(r) else np.nan)})
 
-        # R values
-        r_values2 = []
-        for c in df2["country"].unique():
-            sub = df2[df2["country"] == c]
-            if len(sub) > 1:
-                r = np.corrcoef(sub["median_age"], sub["migrants"])[0, 1]
-                r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2)})
+    overall_r2 = pearsonr_safe(df2["median_age"], df2["migrants"])
+    r_values2.append({"Country": "Overall", "R (Median Age vs Migrants)": (round(overall_r2, 2) if not np.isnan(overall_r2) else np.nan)})
 
-        # Overall R
-        overall_r2 = np.corrcoef(df2["median_age"], df2["migrants"])[0, 1]
-        r_values2.append({"Country": "Overall", "R (Median Age vs Migrants)": round(overall_r2, 2)})
+    st.dataframe(pd.DataFrame(r_values2).set_index("Country"), use_container_width=True)
 
-        st.dataframe(pd.DataFrame(r_values2).set_index("Country"), use_container_width=True)
+    # --- Plot 3: Median Age vs Urban Population % ---
+    df3 = df_all[["median_age", "urban_population_pct", "country"]].dropna()
+    fig3 = go.Figure()
+    for c in df3["country"].unique():
+        sub = df3[df3["country"] == c]
+        fig3.add_trace(go.Scatter(x=sub["median_age"], y=sub["urban_population_pct"],
+                                  mode="markers", name=c))
+    fig3.update_layout(
+        title="Median Age vs Urban Population %",
+        xaxis_title="Median Age",
+        yaxis_title="Urban Population (%)",
+        template="plotly_white",
+        height=600
+    )
+    st.plotly_chart(fig3, use_container_width=True)
 
-        # Median Age vs Urban Population %
-        
-        df3 = df_all[["median_age", "urban_population_pct", "country"]].dropna()
-        fig3 = go.Figure()
-        for c in df3["country"].unique():
-            sub = df3[df3["country"] == c]
-            fig3.add_trace(go.Scatter(x=sub["median_age"], y=sub["urban_population_pct"],
-                                      mode="markers", name=c))
+    r_values3 = []
+    for c in sorted(df3["country"].unique()):
+        sub = df3[df3["country"] == c]
+        r = pearsonr_safe(sub["median_age"], sub["urban_population_pct"])
+        r_values3.append({"Country": c, "R (Median Age vs Urban Pop. %)": (round(r, 2) if not np.isnan(r) else np.nan)})
 
-        fig3.update_layout(
-            title="Median Age vs Urban Population %",
-            xaxis_title="Median Age",
-            yaxis_title="Urban Population (%)",
-            template="plotly_white",
-            height=600
-        )
-        st.plotly_chart(fig3, use_container_width=True)
+    overall_r3 = pearsonr_safe(df3["median_age"], df3["urban_population_pct"])
+    r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": (round(overall_r3, 2) if not np.isnan(overall_r3) else np.nan)})
 
-        # R values
-        r_values3 = []
-        for c in df3["country"].unique():
-            sub = df3[df3["country"] == c]
-            if len(sub) > 1:
-                r = np.corrcoef(sub["median_age"], sub["urban_population_pct"])[0, 1]
-                r_values3.append({"Country": c, "R (Median Age vs Urban Pop. %)": round(r, 2)})
-
-        # Overall R
-        overall_r3 = np.corrcoef(df3["median_age"], df3["urban_population_pct"])[0, 1]
-        r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": round(overall_r3, 2)})
-
-        st.dataframe(pd.DataFrame(r_values3).set_index("Country"), use_container_width=True)
-
-
-
-
-
-
-
-
-
+    st.dataframe(pd.DataFrame(r_values3).set_index("Country"), use_container_width=True)
