@@ -11,7 +11,7 @@ st.set_page_config(page_title="G7 Population Dashboard", layout="wide")
 
 def get_population_data(country_name):
     url = f"https://api.api-ninjas.com/v1/population?country={country_name}"
-    headers = {"X-Api-Key": "ctncIeEoDtS4xty3k/0f2A==gruY3Np8xYnobhv5"} 
+    headers = {"X-Api-Key": "rlwDsTI8EW3/doFNMJ7N4Q==0MsYuVlROHGjDRFD"} 
     response = requests.get(url, headers=headers)
 
     hist_df = pd.DataFrame()
@@ -213,3 +213,4 @@ with tab4:
 
     else:
         st.info("No countries selected. Please select at least one country to view data.")
+
