@@ -98,9 +98,17 @@ with tab2:
             mask = (hist_df.index >= year_range[0]) & (hist_df.index <= year_range[1])
             hist_df = hist_df.loc[mask]
 
+            # 🔹 Exclude Italy, 1995
+            if c == "Italy" and 1995 in hist_df.index:
+                hist_df = hist_df.drop(index=1995)
+
             if "migrants" in hist_df.columns:
-                fig_mig.add_trace(go.Scatter(x=hist_df.index, y=hist_df["migrants"],
-                                             mode="lines+markers", name=c))
+                fig_mig.add_trace(go.Scatter(
+                    x=hist_df.index,
+                    y=hist_df["migrants"],
+                    mode="lines+markers",
+                    name=c
+                ))
 
     fig_mig.update_layout(
         xaxis_title="Year",
@@ -111,6 +119,7 @@ with tab2:
     )
     fig_mig.update_xaxes(dtick=5)
     st.plotly_chart(fig_mig, use_container_width=True)
+
 
 
 with tab3:
@@ -213,4 +222,5 @@ with tab4:
 
     else:
         st.info("No countries selected. Please select at least one country to view data.")
+
 
