@@ -177,6 +177,17 @@ with tab4:
             if not np.isnan(r): r_list.append(r)
             r_values1.append({"Country": c, "R (Median Age vs Fertility Rate)": round(r, 2) if not np.isnan(r) else np.nan})
 
+        # 🔹 Add trendline for overall data
+        if len(df1) > 1:
+            m, b = np.polyfit(df1["median_age"], df1["fertility_rate"], 1)
+            fig1.add_trace(go.Scatter(
+                x=df1["median_age"],
+                y=m * df1["median_age"] + b,
+                mode="lines",
+                name="Trendline",
+                line=dict(color="black", dash="dash")
+            ))
+
         overall_r1 = np.nanmean(r_list) if r_list else np.nan
         r_values1.append({"Country": "Overall", "R (Median Age vs Fertility Rate)": round(overall_r1, 2) if not np.isnan(overall_r1) else np.nan})
 
@@ -194,6 +205,16 @@ with tab4:
             r = pearsonr_safe(sub["median_age"], sub["migrants"])
             if not np.isnan(r): r_list.append(r)
             r_values2.append({"Country": c, "R (Median Age vs Migrants)": round(r, 2) if not np.isnan(r) else np.nan})
+
+        if len(df2) > 1:
+            m, b = np.polyfit(df2["median_age"], df2["migrants"], 1)
+            fig2.add_trace(go.Scatter(
+                x=df2["median_age"],
+                y=m * df2["median_age"] + b,
+                mode="lines",
+                name="Trendline",
+                line=dict(color="black", dash="dash")
+            ))
 
         overall_r2 = np.nanmean(r_list) if r_list else np.nan
         r_values2.append({"Country": "Overall", "R (Median Age vs Migrants)": round(overall_r2, 2) if not np.isnan(overall_r2) else np.nan})
@@ -213,6 +234,16 @@ with tab4:
             if not np.isnan(r): r_list.append(r)
             r_values3.append({"Country": c, "R (Median Age vs Urban Pop. %)": round(r, 2) if not np.isnan(r) else np.nan})
 
+        if len(df3) > 1:
+            m, b = np.polyfit(df3["median_age"], df3["urban_population_pct"], 1)
+            fig3.add_trace(go.Scatter(
+                x=df3["median_age"],
+                y=m * df3["median_age"] + b,
+                mode="lines",
+                name="Trendline",
+                line=dict(color="black", dash="dash")
+            ))
+
         overall_r3 = np.nanmean(r_list) if r_list else np.nan
         r_values3.append({"Country": "Overall", "R (Median Age vs Urban Pop. %)": round(overall_r3, 2) if not np.isnan(overall_r3) else np.nan})
 
@@ -222,5 +253,3 @@ with tab4:
 
     else:
         st.info("No countries selected. Please select at least one country to view data.")
-
-
