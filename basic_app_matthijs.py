@@ -185,7 +185,7 @@ with tab4:
                 y=m * df1["median_age"] + b,
                 mode="lines",
                 name="Trendline",
-                line=dict(color="black", dash="dash")
+                line=dict(color="white", dash="dash")
             ))
 
         overall_r1 = np.nanmean(r_list) if r_list else np.nan
@@ -213,7 +213,7 @@ with tab4:
                 y=m * df2["median_age"] + b,
                 mode="lines",
                 name="Trendline",
-                line=dict(color="black", dash="dash")
+                line=dict(color="white", dash="dash")
             ))
 
         overall_r2 = np.nanmean(r_list) if r_list else np.nan
@@ -241,7 +241,7 @@ with tab4:
                 y=m * df3["median_age"] + b,
                 mode="lines",
                 name="Trendline",
-                line=dict(color="black", dash="dash")
+                line=dict(color="white", dash="dash")
             ))
 
         overall_r3 = np.nanmean(r_list) if r_list else np.nan
@@ -253,3 +253,4 @@ with tab4:
 
     else:
         st.info("No countries selected. Please select at least one country to view data.")
+
